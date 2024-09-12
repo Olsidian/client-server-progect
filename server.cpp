@@ -47,16 +47,24 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // Чтение данных от клиента
-    int valread;
-    std::ofstream outFile("received_data.txt"); // Для демонстрации, меняем на текстовый файл
-    while ((valread = read(new_socket, buffer, 1024)) > 0) {
-        outFile.write(buffer, valread);
-        std::cout << "Received data chunk: " << valread << " bytes" << std::endl;
+    // Открытие файла для сохранения скриншота
+    std::ofstream outFile("received_screenshot.png", std::ios::binary);
+    if (!outFile) {
+        std::cerr << "Error creating file!" << std::endl;
+        close(new_socket);
+        close(server_fd);
+        return 1;
     }
-    outFile.close();
 
-    std::cout << "Data received and saved to file." << std::endl;
+    // Чтение данных от клиента и запись в файл
+    int valread;
+    while ((valread = read(new_socket, buffer, sizeof(buffer))) > 0) {
+        outFile.write(buffer, valread);
+        std::cout << "Received " << valread << " bytes" << std::endl;
+    }
+
+    outFile.close();
+    std::cout << "Screenshot received and saved as 'received_screenshot.png'" << std::endl;
 
     // Закрытие сокета
     close(new_socket);
@@ -64,4 +72,5 @@ int main() {
 
     return 0;
 }
+
 
